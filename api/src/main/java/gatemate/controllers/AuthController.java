@@ -1,0 +1,53 @@
+package gatemate.controllers;
+
+import jakarta.validation.Valid;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.core.userdetails.UserDetails;
+
+import gatemate.data.User;
+import gatemate.dtos.JwtDto;
+import gatemate.dtos.SignInDto;
+import gatemate.dtos.SignUpDto;
+import gatemate.services.AuthService;
+import gatemate.config.auth.TokenProvider;
+
+@RestController
+@RequestMapping("/")
+public class AuthController {
+    @Autowired
+    private AuthenticationManager authenticationManager;
+    @Autowired
+    private AuthService service;
+    @Autowired
+    private TokenProvider tokenService;
+
+    @PostMapping("/signup")
+    public ResponseEntity<?> signUp(@RequestBody @Valid SignUpDto data) {
+        service.signUp(data);
+        System.out.println("User created");
+        return ResponseEntity.status(HttpStatus.CREATED).build();
+    }
+
+    @PostMapping("/login")
+    public ResponseEntity<JwtDto> signIn(@RequestBody @Valid SignInDto data) {
+        var usernamePassword = new UsernamePasswordAuthenticationToken(data.login(), data.password());
+        var authUser = authenticationManager.authenticate(usernamePassword);
+        var accessToken = tokenService.generateAccessToken((User) authUser.getPrincipal());
+        System.out.println("User logged in");
+        return ResponseEntity.ok(new JwtDto(accessToken));
+    }
+
+    @PostMapping("/user")
+    public ResponseEntity<?> getUser(@RequestBody @Valid JwtDto token) {
+        UserDetails user = tokenService.getUserFromToken(token.accessToken());
+        return ResponseEntity.ok(user);
+    }
+}
