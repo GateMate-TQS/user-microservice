@@ -16,13 +16,16 @@ import java.util.List;
 @Service
 public class AuthService implements UserDetailsService {
 
+    private UserRepository repository;
+
     @Autowired
-    UserRepository repository;
+    public AuthService(UserRepository repository) {
+        this.repository = repository;
+    }
 
     @Override
     public UserDetails loadUserByUsername(String username) {
-        var user = repository.findByLogin(username);
-        return user;
+        return repository.findByLogin(username);
     }
 
     public UserDetails signUp(SignUpDto data) throws InvalidJwtException {

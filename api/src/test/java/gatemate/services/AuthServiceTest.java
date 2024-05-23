@@ -33,8 +33,7 @@ class AuthServiceTest {
 
     @BeforeEach
     void setUp() {
-        authService = new AuthService();
-        authService.repository = repository;
+        authService = new AuthService(repository);
     }
 
     @Test
