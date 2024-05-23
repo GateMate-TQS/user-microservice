@@ -32,7 +32,7 @@ import gatemate.config.SecurityDisableConfig;
 
 @Import(SecurityDisableConfig.class)
 @WebMvcTest(AuthController.class)
-public class AuthControllerTest {
+class AuthControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
@@ -111,7 +111,7 @@ public class AuthControllerTest {
     }
 
     @Test
-    void getUserWithValidTokenShouldReturnUserDetails() throws Exception {
+    void getUserWithValidTokenShouldReturnUserDetails(){
         // Given
         String validToken = "someValidJWTToken";
         UserDetails mockUserDetails = createMockUser();

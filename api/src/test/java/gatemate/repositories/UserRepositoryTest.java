@@ -13,14 +13,14 @@ import gatemate.data.UserRole;
 
 
 @DataJpaTest
-public class UserRepositoryTest {
+class UserRepositoryTest {
 
     @Autowired
     private UserRepository userRepository;
 
     @Test
     @DisplayName("Test findByLogin returns UserDetails when user exists")
-    public void testFindByLogin() {
+    void testFindByLogin() {
         // Given
         String login = "testuser";
         User user = new User(login, "password", UserRole.USER);

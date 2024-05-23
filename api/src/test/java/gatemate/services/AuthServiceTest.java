@@ -19,6 +19,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
@@ -100,8 +101,10 @@ class AuthServiceTest {
 
         List<User> result = authService.getAllUsers();
 
-        assertThat(result).isNotNull();
-        assertThat(result).hasSize(2).contains(user1, user2);
+        assertThat(result)
+            .isNotNull()
+            .hasSize(2)
+            .contains(user1, user2);
         verify(repository, times(1)).findAll();
     }
 
