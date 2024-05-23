@@ -21,16 +21,21 @@ import gatemate.config.auth.SecurityFilter;
 @Configuration
 @EnableWebSecurity
 public class AuthConfig {
-    @Autowired
-    SecurityFilter securityFilter;
+
+    // private SecurityFilter securityFilter;
+
+    // @Autowired
+    // public AuthConfig(SecurityFilter securityFilter) {
+    //     this.securityFilter = securityFilter;
+    // }
 
     @Bean
-    SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
+    SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity, SecurityFilter securityFilter) throws Exception {
         return httpSecurity
                 .csrf(csrf -> csrf.disable())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers(HttpMethod.POST, "/api/v1/auth/*").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/*").permitAll()
                         // .requestMatchers(HttpMethod.POST, "/api/v1/coiso").hasRole("ADMIN") ->
                         // exemplo de como restringir acesso a um endpoint
                         .anyRequest().authenticated())
