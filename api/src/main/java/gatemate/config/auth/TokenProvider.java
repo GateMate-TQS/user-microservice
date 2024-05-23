@@ -23,7 +23,7 @@ import java.time.ZoneOffset;
 @Service
 public class TokenProvider {
     @Value("${security.jwt.token.secret-key}")
-    private String JWTSECRET;
+    private String jwtSECRET;
 
     private UserRepository userRepository;
 
@@ -34,7 +34,7 @@ public class TokenProvider {
 
     public String generateAccessToken(User user) {
         try {
-            Algorithm algorithm = Algorithm.HMAC256(JWTSECRET);
+            Algorithm algorithm = Algorithm.HMAC256(jwtSECRET);
             return JWT.create()
                     .withSubject(user.getUsername())
                     .withClaim("username", user.getUsername())
@@ -48,7 +48,7 @@ public class TokenProvider {
 
     public String validateToken(String token) {
         try {
-            Algorithm algorithm = Algorithm.HMAC256(JWTSECRET);
+            Algorithm algorithm = Algorithm.HMAC256(jwtSECRET);
             return JWT.require(algorithm)
                     .build()
                     .verify(token)
@@ -60,7 +60,7 @@ public class TokenProvider {
 
     public UserDetails getUserFromToken(String token) {
         try {
-            Algorithm algorithm = Algorithm.HMAC256(JWTSECRET);
+            Algorithm algorithm = Algorithm.HMAC256(jwtSECRET);
             var decoded = JWT.require(algorithm)
                     .build()
                     .verify(token);
