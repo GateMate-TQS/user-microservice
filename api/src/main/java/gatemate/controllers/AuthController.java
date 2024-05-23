@@ -22,12 +22,19 @@ import gatemate.config.auth.TokenProvider;
 @RestController
 @RequestMapping("/")
 public class AuthController {
-    @Autowired
+
     private AuthenticationManager authenticationManager;
-    @Autowired
+
     private AuthService service;
-    @Autowired
+
     private TokenProvider tokenService;
+
+    @Autowired
+    public AuthController(AuthenticationManager authenticationManager, AuthService service, TokenProvider tokenService) {
+        this.authenticationManager = authenticationManager;
+        this.service = service;
+        this.tokenService = tokenService;
+    }
 
     @PostMapping("/signup")
     public ResponseEntity<?> signUp(@RequestBody @Valid SignUpDto data) {

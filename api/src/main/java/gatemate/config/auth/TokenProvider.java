@@ -25,8 +25,12 @@ public class TokenProvider {
     @Value("${security.jwt.token.secret-key}")
     private String JWTSECRET;
 
-    @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    public TokenProvider(UserRepository userRepository) {
+        this.userRepository = userRepository;
+    }
 
     public String generateAccessToken(User user) {
         try {
