@@ -22,13 +22,6 @@ import gatemate.config.auth.SecurityFilter;
 @EnableWebSecurity
 public class AuthConfig {
 
-    // private SecurityFilter securityFilter;
-
-    // @Autowired
-    // public AuthConfig(SecurityFilter securityFilter) {
-    //     this.securityFilter = securityFilter;
-    // }
-
     @Bean
     SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity, SecurityFilter securityFilter) throws Exception {
         return httpSecurity
