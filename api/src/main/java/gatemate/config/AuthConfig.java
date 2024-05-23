@@ -14,8 +14,10 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
+import gatemate.Generated;
 import gatemate.config.auth.SecurityFilter;
 
+@Generated
 @Configuration
 @EnableWebSecurity
 public class AuthConfig {

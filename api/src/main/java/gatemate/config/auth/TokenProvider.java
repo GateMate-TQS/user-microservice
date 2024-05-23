@@ -4,6 +4,8 @@ import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.exceptions.JWTCreationException;
+
+import gatemate.Generated;
 import gatemate.data.User;
 import gatemate.repositories.UserRepository;
 
@@ -16,6 +18,8 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 
+
+@Generated
 @Service
 public class TokenProvider {
     @Value("${security.jwt.token.secret-key}")
