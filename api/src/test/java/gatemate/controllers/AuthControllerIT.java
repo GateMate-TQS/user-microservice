@@ -19,6 +19,8 @@ import gatemate.repositories.UserRepository;
 
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
+
+import static org.hamcrest.Matchers.emptyString;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.isEmptyString;
@@ -84,7 +86,7 @@ class AuthControllerIT {
 
   @Test
   @DisplayName("POST /login with valid credentials should return JWT token")
-  void signInWithValidCredentialsShouldReturnJwt() throws Exception {
+  void signInWithValidCredentialsShouldReturnJwt() {
     SignInDto signInData = new SignInDto("user", "password");
 
     RestAssuredMockMvc.given()
@@ -94,13 +96,13 @@ class AuthControllerIT {
         .post("/login")
         .then()
         .statusCode(HttpStatus.OK.value())
-        .body("accessToken", is(not(isEmptyString())));
+        .body("accessToken", is(not(emptyString())));
     ;
   }
 
   @Test
   @DisplayName("POST /login with invalid credentials should return 400 Bad Request")
-  void signInWithInvalidCredentialsShouldReturnUnauthorized() throws Exception {
+  void signInWithInvalidCredentialsShouldReturnUnauthorized() {
     SignInDto signInData = new SignInDto("user2", "password");
 
     RestAssuredMockMvc.given()
