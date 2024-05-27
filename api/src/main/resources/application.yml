@@ -1,9 +1,9 @@
 security:
   jwt:
     token:
-      secret-key: 'secret'
+      secret-key: ${JWT_SECRET}
 
 server:
-  port: 8080
+  port: ${USER_PORT}
   error:
     include-stacktrace: never
