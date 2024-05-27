@@ -2,7 +2,6 @@ package gatemate.controllers;
 
 import jakarta.validation.Valid;
 
-import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,15 +20,9 @@ import gatemate.dtos.SignUpDto;
 import gatemate.services.AuthService;
 import gatemate.config.auth.TokenProvider;
 
-import org.slf4j.LoggerFactory;
-
-
 @RestController
 @RequestMapping("/")
 public class AuthController {
-
-    private static final Logger logger = LoggerFactory.getLogger(AuthController.class);
-
     private AuthenticationManager authenticationManager;
 
     private AuthService service;
@@ -37,7 +30,8 @@ public class AuthController {
     private TokenProvider tokenService;
 
     @Autowired
-    public AuthController(AuthenticationManager authenticationManager, AuthService service, TokenProvider tokenService) {
+    public AuthController(AuthenticationManager authenticationManager, AuthService service,
+            TokenProvider tokenService) {
         this.authenticationManager = authenticationManager;
         this.service = service;
         this.tokenService = tokenService;
@@ -46,7 +40,6 @@ public class AuthController {
     @PostMapping("/signup")
     public ResponseEntity<Void> signUp(@RequestBody @Valid SignUpDto data) {
         service.signUp(data);
-        logger.info("User signed up");
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
@@ -55,7 +48,7 @@ public class AuthController {
         var usernamePassword = new UsernamePasswordAuthenticationToken(data.login(), data.password());
         var authUser = authenticationManager.authenticate(usernamePassword);
         var accessToken = tokenService.generateAccessToken((User) authUser.getPrincipal());
-        logger.info("User signed in");
+
         return ResponseEntity.ok(new JwtDto(accessToken));
     }
 

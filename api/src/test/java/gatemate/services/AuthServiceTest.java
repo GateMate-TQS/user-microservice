@@ -31,7 +31,6 @@ class AuthServiceTest {
     @InjectMocks
     private AuthService authService;
 
-
     @BeforeEach
     void setUp() {
         authService = new AuthService(repository);
@@ -55,9 +54,10 @@ class AuthServiceTest {
     void testLoadUserByUsername_UserDoesNotExist() {
         when(repository.findByLogin("testuser")).thenReturn(null);
 
-        UserDetails userDetails = authService.loadUserByUsername("testuser");
+        assertThatThrownBy(() -> authService.loadUserByUsername("testuser"))
+                .isInstanceOf(InvalidJwtException.class)
+                .hasMessage("User not found");
 
-        assertThat(userDetails).isNull();
         verify(repository, times(1)).findByLogin("testuser");
     }
 
@@ -84,8 +84,8 @@ class AuthServiceTest {
         when(repository.findByLogin("existinguser")).thenReturn(existingUser);
 
         assertThatThrownBy(() -> authService.signUp(signUpDto))
-            .isInstanceOf(InvalidJwtException.class)
-            .hasMessage("Username already exists");
+                .isInstanceOf(InvalidJwtException.class)
+                .hasMessage("Username already exists");
 
         verify(repository, times(1)).findByLogin("existinguser");
         verify(repository, never()).save(any(User.class));
@@ -102,9 +102,9 @@ class AuthServiceTest {
         List<User> result = authService.getAllUsers();
 
         assertThat(result)
-            .isNotNull()
-            .hasSize(2)
-            .contains(user1, user2);
+                .isNotNull()
+                .hasSize(2)
+                .contains(user1, user2);
         verify(repository, times(1)).findAll();
     }
 
