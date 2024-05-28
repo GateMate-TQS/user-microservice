@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.web.bind.annotation.RequestParam;
 
 import gatemate.data.User;
 import gatemate.dtos.JwtDto;
@@ -33,17 +32,14 @@ public class AuthController {
 
     private TokenProvider tokenService;
 
-    private AuthService authService;
-
     private UserRepository userRepository;
 
     @Autowired
     public AuthController(AuthenticationManager authenticationManager, AuthService service,
-            TokenProvider tokenService, AuthService authService, UserRepository userRepository) {
+            TokenProvider tokenService, UserRepository userRepository) {
         this.authenticationManager = authenticationManager;
         this.service = service;
         this.tokenService = tokenService;
-        this.authService = authService;
         this.userRepository = userRepository;
     }
 
