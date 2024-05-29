@@ -1,4 +1,4 @@
-package gatemate;
+package gatemate.cucumber;
 
 import static io.cucumber.junit.platform.engine.Constants.*;
 
@@ -12,9 +12,8 @@ import org.junit.platform.suite.api.Suite;
 
 @Suite
 @IncludeEngines("cucumber")
-@SelectClasspathResource("gatemate")
-@ConfigurationParameter(key = PLUGIN_PROPERTY_NAME, value = "pretty")
-@ConfigurationParameter(key = GLUE_PROPERTY_NAME, value = "gatemate")
+@SelectClasspathResource("gatemate/cucumber")
+@ConfigurationParameter(key = GLUE_PROPERTY_NAME, value = "gatemate/cucumber")
 class UserTest {
 
     @Disabled("This test is disabled because it's not implemented yet")
