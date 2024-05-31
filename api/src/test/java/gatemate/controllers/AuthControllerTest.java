@@ -20,6 +20,7 @@ import gatemate.dtos.SignInDto;
 import gatemate.dtos.SignUpDto;
 import gatemate.exceptions.InvalidJwtException;
 import gatemate.repositories.UserRepository;
+import gatemate.dtos.UserInfoDto;
 
 import static org.hamcrest.Matchers.equalTo;
 import static org.mockito.Mockito.times;
@@ -164,6 +165,27 @@ class AuthControllerTest {
                                 .body("role", equalTo("USER"));
 
                 verify(tokenService, times(1)).getUserFromToken(validToken);
+        }
+
+        @Test
+        @DisplayName("GET /user with valid login should return user details")
+        void getUserWithValidLoginShouldReturnUserDetails() {
+                UserDetails mockUserDetails = createMockUser();
+                UserInfoDto userInfoDto = new UserInfoDto("user");
+
+                when(userRepository.findByLogin("user")).thenReturn(mockUserDetails);
+
+                RestAssuredMockMvc.given()
+                                .contentType("application/json")
+                                .body(userInfoDto)
+                                .when()
+                                .get("/user")
+                                .then()
+                                .statusCode(HttpStatus.OK.value())
+                                .body("login", equalTo("user"))
+                                .body("role", equalTo("USER"));
+
+                verify(userRepository, times(1)).findByLogin("user");
         }
 
         private UserDetails createMockUser() {

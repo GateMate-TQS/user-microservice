@@ -28,6 +28,7 @@ public class AuthConfig {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers(HttpMethod.POST, "/*").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/*").permitAll()
                         // .requestMatchers(HttpMethod.POST, "/api/v1/coiso").hasRole("ADMIN") ->
                         // exemplo de como restringir acesso a um endpoint
                         .anyRequest().authenticated())
