@@ -7,6 +7,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -17,8 +18,10 @@ import gatemate.data.User;
 import gatemate.dtos.JwtDto;
 import gatemate.dtos.SignInDto;
 import gatemate.dtos.SignUpDto;
+import gatemate.dtos.UserInfoDto;
 import gatemate.services.AuthService;
 import gatemate.config.auth.TokenProvider;
+import gatemate.repositories.UserRepository;
 
 @RestController
 @RequestMapping("/")
@@ -29,12 +32,15 @@ public class AuthController {
 
     private TokenProvider tokenService;
 
+    private UserRepository userRepository;
+
     @Autowired
     public AuthController(AuthenticationManager authenticationManager, AuthService service,
-            TokenProvider tokenService) {
+            TokenProvider tokenService, UserRepository userRepository) {
         this.authenticationManager = authenticationManager;
         this.service = service;
         this.tokenService = tokenService;
+        this.userRepository = userRepository;
     }
 
     @PostMapping("/signup")
@@ -57,4 +63,12 @@ public class AuthController {
         UserDetails user = tokenService.getUserFromToken(token.accessToken());
         return ResponseEntity.ok(user);
     }
+
+    @GetMapping("/user")
+    public ResponseEntity<UserDetails> getUser(@RequestBody @Valid UserInfoDto data) {
+        UserDetails user = userRepository.findByLogin(data.login());
+
+        return ResponseEntity.ok(user);
+    }
+
 }

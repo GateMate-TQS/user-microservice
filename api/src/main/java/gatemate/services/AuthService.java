@@ -24,8 +24,9 @@ public class AuthService implements UserDetailsService {
     }
 
     @Override
-    public UserDetails loadUserByUsername(String username) {
-        UserDetails user = repository.findByLogin(username);
+    public UserDetails loadUserByUsername(String login) {
+        UserDetails user = repository.findByLogin(login);
+
         if (user == null) {
             throw new InvalidJwtException("User not found");
         }
