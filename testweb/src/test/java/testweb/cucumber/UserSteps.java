@@ -1,4 +1,4 @@
-package gatemate.cucumber;
+package testweb.cucumber;
 
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.openqa.selenium.WebDriver;
@@ -22,22 +22,18 @@ public class UserSteps {
         try {
             WebDriverManager.chromedriver().setup();
             ChromeOptions options = new ChromeOptions();
-            options.addArguments("--ignore-certificate-errors");
-            options.addArguments("--allow-insecure-localhost");
-            options.addArguments("--headless");  // Optional: Run in headless mode
+            options.addArguments("--disable-gpu");
             options.addArguments("--no-sandbox");
             options.addArguments("--disable-dev-shm-usage");
-            options.addArguments("--disable-gpu");
             options.setAcceptInsecureCerts(true);
-            System.setProperty("webdriver.chrome.logfile", "/path/to/chromedriver.log");
-            System.setProperty("webdriver.chrome.verboseLogging", "true");
+            
             driver = new ChromeDriver(options);
         } catch (Exception e) {
             e.printStackTrace();
             throw new RuntimeException("Failed to initialize WebDriver: " + e.getMessage());
         }
     }
-
+    
     @After
     public void tearDown() {
         if (driver != null) {
