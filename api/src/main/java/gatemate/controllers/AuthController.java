@@ -64,7 +64,7 @@ public class AuthController {
         return ResponseEntity.ok(user);
     }
 
-    @GetMapping("/user")
+    @PostMapping("/userId")
     public ResponseEntity<UserDetails> getUser(@RequestBody @Valid UserInfoDto data) {
         UserDetails user = userRepository.findByLogin(data.login());
 

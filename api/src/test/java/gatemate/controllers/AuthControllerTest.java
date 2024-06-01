@@ -179,7 +179,7 @@ class AuthControllerTest {
                                 .contentType("application/json")
                                 .body(userInfoDto)
                                 .when()
-                                .get("/user")
+                                .post("/userId")
                                 .then()
                                 .statusCode(HttpStatus.OK.value())
                                 .body("login", equalTo("user"))
