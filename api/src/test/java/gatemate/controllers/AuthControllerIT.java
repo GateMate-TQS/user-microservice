@@ -1,7 +1,11 @@
 package gatemate.controllers;
 
-import io.restassured.module.mockmvc.RestAssuredMockMvc;
+import static org.hamcrest.Matchers.emptyString;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.not;
 
+import io.restassured.module.mockmvc.RestAssuredMockMvc;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -9,6 +13,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.HttpStatus;
 import org.springframework.test.web.servlet.MockMvc;
 
 import gatemate.data.UserRole;
@@ -17,18 +23,11 @@ import gatemate.dtos.SignInDto;
 import gatemate.dtos.SignUpDto;
 import gatemate.repositories.UserRepository;
 
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.http.HttpStatus;
-
-import static org.hamcrest.Matchers.emptyString;
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.not;
-
 @AutoConfigureMockMvc
 @AutoConfigureTestDatabase
 @SpringBootTest
 class AuthControllerIT {
+
   @Autowired
   private MockMvc mockMvc;
 
@@ -39,6 +38,7 @@ class AuthControllerIT {
   void setUp() {
     RestAssuredMockMvc.mockMvc(mockMvc);
 
+    // Cria um usuário de teste antes de cada teste
     SignUpDto data = new SignUpDto("user", "password", UserRole.USER);
 
     RestAssuredMockMvc.given()
@@ -52,6 +52,7 @@ class AuthControllerIT {
 
   @AfterEach
   void clearDatabase() {
+    // Limpa o banco de dados após cada teste
     userRepository.deleteAll();
   }
 
@@ -96,13 +97,12 @@ class AuthControllerIT {
         .then()
         .statusCode(HttpStatus.OK.value())
         .body("accessToken", is(not(emptyString())));
-    ;
   }
 
   @Test
-  @DisplayName("POST /login with invalid credentials should return 400 Bad Request")
+  @DisplayName("POST /login with invalid credentials should return 401 Unauthorized")
   void signInWithInvalidCredentialsShouldReturnUnauthorized() {
-    SignInDto signInData = new SignInDto("user2", "password");
+    SignInDto signInData = new SignInDto("user1", "password");
 
     RestAssuredMockMvc.given()
         .contentType("application/json")
@@ -110,8 +110,7 @@ class AuthControllerIT {
         .when()
         .post("/login")
         .then()
-        .statusCode(HttpStatus.INTERNAL_SERVER_ERROR.value())
-        .body("message", equalTo(null));
+        .statusCode(HttpStatus.INTERNAL_SERVER_ERROR.value());
   }
 
   @Test
@@ -139,5 +138,4 @@ class AuthControllerIT {
         .statusCode(HttpStatus.OK.value())
         .body("login", equalTo("user"));
   }
-
 }

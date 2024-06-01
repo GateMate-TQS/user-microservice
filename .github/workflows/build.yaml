@@ -44,5 +44,3 @@ jobs:
           USER_PORT: 8080
         run: mvn -B install failsafe:integration-test org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey=GateMate-TQS_user-microservice -fae
         working-directory: ./api
-      - name: Cleanup Docker containers
-        run: docker compose -f compose.test.yml down --volumes
