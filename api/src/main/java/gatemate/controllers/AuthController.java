@@ -24,15 +24,18 @@ import gatemate.services.AuthService;
 import gatemate.config.auth.TokenProvider;
 import gatemate.repositories.UserRepository;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+
 @RestController
 @RequestMapping("/")
 public class AuthController {
     private AuthenticationManager authenticationManager;
-
     private AuthService service;
-
     private TokenProvider tokenService;
-
     private UserRepository userRepository;
 
     @Autowired
@@ -44,6 +47,11 @@ public class AuthController {
         this.userRepository = userRepository;
     }
 
+    @Operation(summary = "Cadastrar um novo usuário")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "Usuário criado com sucesso"),
+            @ApiResponse(responseCode = "400", description = "Erro ao criar usuário", content = @Content(schema = @Schema(implementation = String.class)))
+    })
     @PostMapping("/signup")
     public ResponseEntity<Object> signUp(@RequestBody @Valid SignUpDto data) {
         try {
@@ -54,6 +62,11 @@ public class AuthController {
         }
     }
 
+    @Operation(summary = "Autenticar um usuário e retornar um token JWT")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Autenticação bem-sucedida", content = @Content(schema = @Schema(implementation = JwtDto.class))),
+            @ApiResponse(responseCode = "401", description = "Credenciais inválidas", content = @Content(schema = @Schema(implementation = JwtDto.class)))
+    })
     @PostMapping("/login")
     public ResponseEntity<JwtDto> signIn(@RequestBody @Valid SignInDto data) {
         try {
@@ -66,6 +79,11 @@ public class AuthController {
         }
     }
 
+    @Operation(summary = "Obter detalhes do usuário a partir do token JWT")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Detalhes do usuário retornados com sucesso", content = @Content(schema = @Schema(implementation = UserDetails.class))),
+            @ApiResponse(responseCode = "400", description = "Token JWT inválido", content = @Content)
+    })
     @PostMapping("/user")
     public ResponseEntity<UserDetails> getUser(@RequestBody @Valid JwtDto token) {
         try {
@@ -76,6 +94,11 @@ public class AuthController {
         }
     }
 
+    @Operation(summary = "Obter detalhes do usuário a partir do login")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Detalhes do usuário retornados com sucesso", content = @Content(schema = @Schema(implementation = UserDetails.class))),
+            @ApiResponse(responseCode = "404", description = "Usuário não encontrado", content = @Content)
+    })
     @PostMapping("/userId")
     public ResponseEntity<UserDetails> getUser(@RequestBody @Valid UserInfoDto data) {
         UserDetails user = userRepository.findByLogin(data.login());

@@ -29,6 +29,9 @@ public class AuthConfig {
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers(HttpMethod.POST, "/*").permitAll()
                         .requestMatchers(HttpMethod.GET, "/*").permitAll()
+                        // permitir ao swagger
+                        .requestMatchers(HttpMethod.GET, "/swagger-ui/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/v3/api-docs/**").permitAll()
                         // .requestMatchers(HttpMethod.POST, "/api/v1/coiso").hasRole("ADMIN") ->
                         // exemplo de como restringir acesso a um endpoint
                         .anyRequest().authenticated())
