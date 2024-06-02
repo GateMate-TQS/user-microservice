@@ -43,7 +43,6 @@ public class Registerpage {
     }
 
     public void assertRole(String role) {
-        System.out.println("Selected role: " + getSelectedRole());
 
         if (!getSelectedRole().equals(role)) {
             Select dropdown = new Select(roleDropdown);

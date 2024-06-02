@@ -36,15 +36,12 @@ public class IndexPage {
         try {
             WebElement user_photo = wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//img[@alt='User']")));
             user_photo.click();
-            System.out.println("user_photo: " + user_photo);
 
             WebElement mytickets = wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//div[@id='root']/div/div/div/div[2]/div/div[3]/div/a[2]/button")));
             mytickets.click();
-            System.out.println("mytickets: " + mytickets);
             return true;
 
         } catch (Exception e) {
-            System.out.println("user_photo: " + e);
             return false;
         }
     }
@@ -55,15 +52,12 @@ public class IndexPage {
         try {
             WebElement user_photo = wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//img[@alt='User']")));
             user_photo.click();
-            System.out.println("user_photo: " + user_photo);
 
             WebElement mytickets = wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//button[contains(.,'My Tickets')]")));
             mytickets.click();
-            System.out.println("mytickets: " + mytickets);
             return true;
 
         } catch (Exception e) {
-            System.out.println("user_photo: " + e);
             return false;
         }
     }
