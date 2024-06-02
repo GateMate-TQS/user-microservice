@@ -37,7 +37,7 @@ class AuthServiceTest {
     }
 
     @Test
-    @DisplayName("Test loadUserByUsername returns UserDetails when user exists")
+    @DisplayName("When load user by username then return user")
     void testLoadUserByUsername_UserExists() {
         User mockUser = new User("testuser", "password", UserRole.USER);
         when(repository.findByLogin("testuser")).thenReturn(mockUser);
@@ -50,7 +50,7 @@ class AuthServiceTest {
     }
 
     @Test
-    @DisplayName("Test loadUserByUsername returns null when user does not exist")
+    @DisplayName("When load user by username and user does not exist then throw exception")
     void testLoadUserByUsername_UserDoesNotExist() {
         when(repository.findByLogin("testuser")).thenReturn(null);
 
@@ -62,7 +62,7 @@ class AuthServiceTest {
     }
 
     @Test
-    @DisplayName("Test signUp successfully registers a new user")
+    @DisplayName("When sign up with new user then return user details")
     void testSignUp_Success() throws InvalidJwtException {
         SignUpDto signUpDto = new SignUpDto("newuser", "newpassword", UserRole.USER);
         when(repository.findByLogin("newuser")).thenReturn(null);
@@ -77,7 +77,7 @@ class AuthServiceTest {
     }
 
     @Test
-    @DisplayName("Test signUp throws InvalidJwtException when username already exists")
+    @DisplayName("When sign up with existing username then throw exception")
     void testSignUp_UsernameExists() {
         SignUpDto signUpDto = new SignUpDto("existinguser", "password", UserRole.USER);
         User existingUser = new User("existinguser", "password", UserRole.USER);
@@ -92,7 +92,7 @@ class AuthServiceTest {
     }
 
     @Test
-    @DisplayName("Test getAllUsers returns list of users")
+    @DisplayName("When get all users then return all users")
     void testGetAllUsers() {
         User user1 = new User("user1", "password1", UserRole.USER);
         User user2 = new User("user2", "password2", UserRole.USER);
@@ -109,12 +109,28 @@ class AuthServiceTest {
     }
 
     @Test
-    @DisplayName("Test deleteAllUsers deletes all users")
+    @DisplayName("When delete all users then delete all users")
     void testDeleteAllUsers() {
         doNothing().when(repository).deleteAll();
 
         authService.deleteAllUsers();
 
         verify(repository, times(1)).deleteAll();
+    }
+
+    @Test
+    @DisplayName("When sign up with new user then return user details with encrypted password")
+    void testSignUp_Success_EncryptedPassword() throws InvalidJwtException {
+        SignUpDto signUpDto = new SignUpDto("newuser", "newpassword", UserRole.USER);
+        when(repository.findByLogin("newuser")).thenReturn(null);
+        when(repository.save(any(User.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        UserDetails userDetails = authService.signUp(signUpDto);
+
+        assertThat(userDetails).isNotNull();
+        assertThat(userDetails.getUsername()).isEqualTo("newuser");
+        assertThat(userDetails.getPassword()).startsWith("$2a$");
+        verify(repository, times(1)).findByLogin("newuser");
+        verify(repository, times(1)).save(any(User.class));
     }
 }

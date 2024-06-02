@@ -1,5 +1,8 @@
 package gatemate.controllers;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -7,29 +10,26 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
+import org.springframework.http.HttpStatus;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.test.web.servlet.MockMvc;
+
+import static org.hamcrest.Matchers.equalTo;
 
 import io.restassured.module.mockmvc.RestAssuredMockMvc;
 import gatemate.config.auth.TokenProvider;
 import gatemate.data.User;
 import gatemate.data.UserRole;
-import gatemate.services.AuthService;
 import gatemate.dtos.JwtDto;
 import gatemate.dtos.SignInDto;
 import gatemate.dtos.SignUpDto;
+import gatemate.dtos.UserInfoDto;
 import gatemate.exceptions.InvalidJwtException;
 import gatemate.repositories.UserRepository;
-import gatemate.dtos.UserInfoDto;
-
-import static org.hamcrest.Matchers.equalTo;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-import org.springframework.http.HttpStatus;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.TestingAuthenticationToken;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import gatemate.services.AuthService;
 import gatemate.config.SecurityDisableConfig;
 
 @Import(SecurityDisableConfig.class)
@@ -71,7 +71,6 @@ class AuthControllerTest {
                                 .then()
                                 .statusCode(HttpStatus.CREATED.value());
 
-                // Verify that the signUp method of service is called once
                 verify(service, times(1)).signUp(data);
         }
 
@@ -95,17 +94,17 @@ class AuthControllerTest {
 
         @Test
         @DisplayName("POST /login with valid credentials should return JWT token")
-        void signInWithValidCredentialsShouldReturnJwt() throws Exception {
+        void signInWithValidCredentialsShouldReturnJwt() {
                 SignInDto signInData = new SignInDto("user", "password"); // Correct credentials
 
-                User mockUser = new User("user", "password", UserRole.USER);
+                User mockUser = createMockUser();
                 UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
                                 signInData.login(), signInData.password());
 
                 String expectedToken = "generatedJwtToken";
 
-                when(authenticationManager.authenticate(authenticationToken))
-                                .thenReturn(new TestingAuthenticationToken(mockUser, null));
+                when(authenticationManager.authenticate(authenticationToken)).thenReturn(
+                                new UsernamePasswordAuthenticationToken(mockUser, null));
                 when(tokenService.generateAccessToken(mockUser)).thenReturn(expectedToken);
 
                 RestAssuredMockMvc.given()
@@ -122,14 +121,12 @@ class AuthControllerTest {
         }
 
         @Test
-        @DisplayName("POST /login with invalid credentials should return 400 Bad Request")
-        void signInWithInvalidCredentialsShouldReturnBadRequest() throws Exception {
+        @DisplayName("POST /login with invalid credentials should return 401 Unauthorized")
+        void signInWithInvalidCredentialsShouldReturnUnauthorized() {
                 SignInDto signInData = new SignInDto("user", "password"); // Incorrect credentials
 
-                when(authenticationManager
-                                .authenticate(new UsernamePasswordAuthenticationToken(signInData.login(),
-                                                signInData.password())))
-                                .thenThrow(new InvalidJwtException("Invalid credentials"));
+                when(authenticationManager.authenticate(any(UsernamePasswordAuthenticationToken.class)))
+                                .thenThrow(new BadCredentialsException("Invalid credentials"));
 
                 RestAssuredMockMvc.given()
                                 .contentType("application/json")
@@ -137,11 +134,9 @@ class AuthControllerTest {
                                 .when()
                                 .post("/login")
                                 .then()
-                                .statusCode(HttpStatus.BAD_REQUEST.value());
+                                .statusCode(HttpStatus.UNAUTHORIZED.value());
 
-                verify(authenticationManager, times(1))
-                                .authenticate(new UsernamePasswordAuthenticationToken(signInData.login(),
-                                                signInData.password()));
+                verify(authenticationManager, times(1)).authenticate(any(UsernamePasswordAuthenticationToken.class));
         }
 
         @Test
@@ -168,7 +163,27 @@ class AuthControllerTest {
         }
 
         @Test
-        @DisplayName("GET /user with valid login should return user details")
+        @DisplayName("POST /user with invalid token should return 400 Bad Request")
+        void getUserWithInvalidTokenShouldReturnBadRequest() {
+                String invalidToken = "invalidJWTToken";
+
+                when(tokenService.getUserFromToken(invalidToken)).thenThrow(new InvalidJwtException("Invalid token"));
+
+                JwtDto jwtDto = new JwtDto(invalidToken);
+
+                RestAssuredMockMvc.given()
+                                .contentType("application/json")
+                                .body(jwtDto)
+                                .when()
+                                .post("/user")
+                                .then()
+                                .statusCode(HttpStatus.BAD_REQUEST.value());
+
+                verify(tokenService, times(1)).getUserFromToken(invalidToken);
+        }
+
+        @Test
+        @DisplayName("GET /userId with valid login should return user details")
         void getUserWithValidLoginShouldReturnUserDetails() {
                 UserDetails mockUserDetails = createMockUser();
                 UserInfoDto userInfoDto = new UserInfoDto("user");
@@ -179,7 +194,7 @@ class AuthControllerTest {
                                 .contentType("application/json")
                                 .body(userInfoDto)
                                 .when()
-                                .get("/user")
+                                .post("/userId")
                                 .then()
                                 .statusCode(HttpStatus.OK.value())
                                 .body("login", equalTo("user"))
@@ -188,7 +203,25 @@ class AuthControllerTest {
                 verify(userRepository, times(1)).findByLogin("user");
         }
 
-        private UserDetails createMockUser() {
+        @Test
+        @DisplayName("GET /userId with invalid login should return 404 Not Found")
+        void getUserWithInvalidLoginShouldReturnNotFound() {
+                when(userRepository.findByLogin("nonExistingUser")).thenReturn(null);
+
+                UserInfoDto userInfoDto = new UserInfoDto("nonExistingUser");
+
+                RestAssuredMockMvc.given()
+                                .contentType("application/json")
+                                .body(userInfoDto)
+                                .when()
+                                .post("/userId")
+                                .then()
+                                .statusCode(HttpStatus.NOT_FOUND.value());
+
+                verify(userRepository, times(1)).findByLogin("nonExistingUser");
+        }
+
+        private User createMockUser() {
                 return new User("user", "password", UserRole.USER);
         }
 }
