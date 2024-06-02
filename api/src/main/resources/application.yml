@@ -3,6 +3,10 @@ security:
     token:
       secret-key: ${JWT_SECRET}
 
+server:
+  port: ${USER_PORT}
+  error:
+    include-stacktrace: never
 
 spring:
   jpa:
