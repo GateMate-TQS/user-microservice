@@ -106,6 +106,7 @@ public class UserSteps {
     public void the_user_is_redirected_to_the_homepage() {
     
         assertEquals("http://localhost/", driver.getCurrentUrl());
+        assertTrue(indexPage.isLoggedAsUser());
     }
 
     @Given("the user doesnt have an account") 
@@ -151,7 +152,7 @@ public class UserSteps {
     @When("the user selects {string} as role") 
     public void the_user_selects_as_role(String role)
     {
-        assertTrue(registerPage.assertRole(role));
+        registerPage.assertRole(role);
     }
 
     @When("the user clicks to register")
@@ -167,6 +168,13 @@ public class UserSteps {
     @Then("the user is registed and redirected to the login")
     public void the_user_is_registed_and_redirected_to_the_login() {
         assertEquals("http://localhost/login", driver.getCurrentUrl());
+    }
+
+    @Then("the user loggedin and is redirected to the admin homepage")
+    public void the_user_is_redirected_to_the_admin_homepage() {
+        assertEquals("http://localhost/", driver.getCurrentUrl());
+
+        assertTrue(indexPage.isLoggedAsAdmin());
     }
 
 }

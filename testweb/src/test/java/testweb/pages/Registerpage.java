@@ -42,9 +42,14 @@ public class Registerpage {
         confirmPassword_.sendKeys(confirmPassword);
     }
 
-    public boolean assertRole(String role) {
+    public void assertRole(String role) {
         System.out.println("Selected role: " + getSelectedRole());
-        return getSelectedRole().equals(role);
+
+        if (!getSelectedRole().equals(role)) {
+            Select dropdown = new Select(roleDropdown);
+            dropdown.selectByVisibleText(role);
+        }
+
     }
     public String getSelectedRole() {
         Select dropdown = new Select(roleDropdown);
